@@ -1,29 +1,11 @@
 import TaskCard from "../components/TaskCard";
-
-const mockTasks = [
-  {
-    id: 1,
-    title: "Write case study for new landing page",
-    description: "Focus on conversion rate improvements and user feedback.",
-    priority: "high",
-    completed: false,
-  },
-  {
-    id: 2,
-    title: "Fix mobile nav scroll issue",
-    priority: "medium",
-    completed: true,
-  },
-  {
-    id: 3,
-    title: "Organize next sprint planning",
-    description: "Include the whole frontend team + PM.",
-    priority: "low",
-    completed: false,
-  },
-];
+import { useTaskStore } from "../store/useTaskStore";
 
 export default function Tasks() {
+  const tasks = useTaskStore((state) => state.tasks);
+  const toggleTask = useTaskStore((state) => state.toggleTask);
+  const deleteTask = useTaskStore((state) => state.deleteTask);
+
   return (
     <div className="space-y-6">
       <header className="flex justify-between items-center">
@@ -36,17 +18,23 @@ export default function Tasks() {
         </button>
       </header>
 
-      <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-        {mockTasks.map((task) => (
-          <TaskCard
-            key={task.id}
-            title={task.title}
-            description={task.description}
-            priority={task.priority as "low" | "medium" | "high"}
-            completed={task.completed}
-          />
-        ))}
-      </section>
+      {tasks.length === 0 ? (
+        <p className="text-gray-500 text-sm mt-10">No tasks available.</p>
+      ) : (
+        <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          {tasks.map((task) => (
+            <TaskCard
+              key={task.id}
+              title={task.title}
+              description={task.description}
+              priority={task.priority}
+              completed={task.completed}
+              onToggle={() => toggleTask(task.id)}
+              onDelete={() => deleteTask(task.id)}
+            />
+          ))}
+        </section>
+      )}
     </div>
   );
 }
