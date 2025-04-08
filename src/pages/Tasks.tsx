@@ -1,7 +1,10 @@
+import { useState } from "react";
 import TaskCard from "../components/TaskCard";
+import AddTaskModal from "../components/AddTaskModal";
 import { useTaskStore } from "../store/useTaskStore";
 
 export default function Tasks() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const tasks = useTaskStore((state) => state.tasks);
   const toggleTask = useTaskStore((state) => state.toggleTask);
   const deleteTask = useTaskStore((state) => state.deleteTask);
@@ -11,9 +14,14 @@ export default function Tasks() {
       <header className="flex justify-between items-center">
         <div>
           <h2 className="text-2xl font-semibold">Tasks</h2>
-          <p className="text-sm text-gray-500">Manage your current and upcoming work.</p>
+          <p className="text-sm text-gray-500">
+            Manage your current and upcoming work.
+          </p>
         </div>
-        <button className="px-4 py-2 text-sm bg-brand text-white rounded-lg hover:bg-brand-dark transition">
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="px-4 py-2 text-sm bg-brand text-white rounded-lg hover:bg-brand-dark transition"
+        >
           + New Task
         </button>
       </header>
@@ -35,6 +43,8 @@ export default function Tasks() {
           ))}
         </section>
       )}
+
+      <AddTaskModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </div>
   );
 }
