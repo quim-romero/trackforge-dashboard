@@ -3,23 +3,28 @@ import { persist } from "zustand/middleware";
 
 type Theme = "light" | "dark";
 
-interface ThemeState {
+interface ThemeStore {
   theme: Theme;
+  setTheme: (theme: Theme) => void;
   toggleTheme: () => void;
 }
 
-export const useThemeStore = create<ThemeState>()(
+export const useThemeStore = create<ThemeStore>()(
   persist(
     (set, get) => ({
       theme: "light",
+      setTheme: (theme) => {
+        set({ theme });
+        document.documentElement.classList.toggle("dark", theme === "dark");
+      },
       toggleTheme: () => {
-        const next = get().theme === "light" ? "dark" : "light";
-        set({ theme: next });
-        document.documentElement.classList.toggle("dark", next === "dark");
+        const newTheme = get().theme === "dark" ? "light" : "dark";
+        set({ theme: newTheme });
+        document.documentElement.classList.toggle("dark", newTheme === "dark");
       },
     }),
     {
-      name: "trackforge-theme",
+      name: "theme-storage",
     }
   )
 );
