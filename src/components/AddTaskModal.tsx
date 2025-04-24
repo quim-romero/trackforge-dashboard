@@ -16,10 +16,18 @@ type FormData = z.infer<typeof schema>;
 type AddTaskModalProps = {
   isOpen: boolean;
   onClose: () => void;
+  defaultValues?: FormData & { id?: string | number }; // For editing
 };
 
-export default function AddTaskModal({ isOpen, onClose }: AddTaskModalProps) {
+export default function AddTaskModal({
+  isOpen,
+  onClose,
+  defaultValues,
+}: AddTaskModalProps) {
   const addTask = useTaskStore((state) => state.addTask);
+  const updateTask = useTaskStore((state) => state.updateTask);
+
+  const isEditMode = !!defaultValues;
 
   const {
     register,
@@ -28,7 +36,7 @@ export default function AddTaskModal({ isOpen, onClose }: AddTaskModalProps) {
     formState: { errors },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
-    defaultValues: {
+    defaultValues: defaultValues || {
       title: "",
       description: "",
       priority: "medium",
@@ -36,11 +44,18 @@ export default function AddTaskModal({ isOpen, onClose }: AddTaskModalProps) {
   });
 
   useEffect(() => {
-    if (isOpen) reset();
-  }, [isOpen, reset]);
+    if (isOpen)
+      reset(
+        defaultValues || { title: "", description: "", priority: "medium" }
+      );
+  }, [isOpen, defaultValues, reset]);
 
   const onSubmit = (data: FormData) => {
-    addTask({ ...data, completed: false });
+    if (isEditMode && defaultValues?.id != null) {
+      updateTask(String(defaultValues.id), data);
+    } else {
+      addTask({ ...data, completed: false });
+    }
     onClose();
   };
 
@@ -48,44 +63,56 @@ export default function AddTaskModal({ isOpen, onClose }: AddTaskModalProps) {
 
   return (
     <div className="fixed inset-0 bg-black/40 z-40 flex items-center justify-center">
-      <div className="bg-white rounded-xl p-6 w-full max-w-md shadow-xl relative z-50">
+      <div className="bg-white dark:bg-gray-900 rounded-xl p-6 w-full max-w-md shadow-xl relative z-50 border border-gray-200 dark:border-gray-700">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
           aria-label="Close"
         >
           <X className="w-5 h-5" />
         </button>
 
-        <h3 className="text-lg font-semibold mb-4">New Task</h3>
+        <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">
+          {isEditMode ? "Edit Task" : "New Task"}
+        </h3>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-1">Title</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Title
+            </label>
             <input
               type="text"
               {...register("title")}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+              className="w-full rounded-md px-3 py-2 text-sm border bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand"
+              placeholder="Task title"
             />
             {errors.title && (
-              <p className="text-sm text-red-500 mt-1">{errors.title.message}</p>
+              <p className="text-sm text-red-500 mt-1">
+                {errors.title.message}
+              </p>
             )}
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">Description</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Description
+            </label>
             <textarea
               {...register("description")}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
               rows={3}
+              placeholder="Description (optional)"
+              className="w-full rounded-md px-3 py-2 text-sm border bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand resize-none"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">Priority</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Priority
+            </label>
             <select
               {...register("priority")}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+              className="w-full rounded-md px-3 py-2 text-sm border bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
             >
               <option value="low">Low</option>
               <option value="medium">Medium</option>
@@ -96,9 +123,9 @@ export default function AddTaskModal({ isOpen, onClose }: AddTaskModalProps) {
           <div className="pt-2">
             <button
               type="submit"
-              className="bg-brand text-white px-4 py-2 rounded-md hover:bg-brand-dark transition"
+              className="w-full bg-brand text-white px-4 py-2 rounded-md hover:bg-brand-dark transition"
             >
-              Create Task
+              {isEditMode ? "Save Changes" : "Create Task"}
             </button>
           </div>
         </form>

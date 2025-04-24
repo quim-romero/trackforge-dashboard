@@ -3,9 +3,11 @@ import TaskCard from "../components/TaskCard";
 import AddTaskModal from "../components/AddTaskModal";
 import { useTaskStore } from "../store/useTaskStore";
 import { useSettingsStore } from "../store/useSettingsStore";
+import type { Task } from "../types";
 
 export default function Tasks() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [statusFilter, setStatusFilter] = useState<
     "all" | "completed" | "active"
   >("all");
@@ -16,7 +18,6 @@ export default function Tasks() {
   const tasks = useTaskStore((state) => state.tasks);
   const toggleTask = useTaskStore((state) => state.toggleTask);
   const deleteTask = useTaskStore((state) => state.deleteTask);
-
   const density = useSettingsStore((state) => state.density);
 
   const layoutSpacing = density === "compact" ? "space-y-2" : "space-y-8";
@@ -48,14 +49,18 @@ export default function Tasks() {
           </p>
         </div>
         <button
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => {
+            setEditingTask(null);
+            setIsModalOpen(true);
+          }}
           className="px-4 py-2 text-sm bg-brand text-white rounded-lg hover:bg-brand-dark transition"
         >
           + New Task
         </button>
       </header>
 
-      <div className={`flex flex-wrap gap-4`}>
+      <div className="flex flex-wrap gap-4">
+        {/* Filters */}
         <div>
           <label className="block text-sm text-gray-600 dark:text-gray-300 mb-1">
             Status
@@ -63,7 +68,7 @@ export default function Tasks() {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value as any)}
-            className={`rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 ${filterPadding}`}
+            className={`rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 ${filterPadding}`}
           >
             <option value="all">All</option>
             <option value="active">Active</option>
@@ -78,7 +83,7 @@ export default function Tasks() {
           <select
             value={priorityFilter}
             onChange={(e) => setPriorityFilter(e.target.value as any)}
-            className={`rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 ${filterPadding}`}
+            className={`rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 ${filterPadding}`}
           >
             <option value="all">All</option>
             <option value="high">High</option>
@@ -88,6 +93,7 @@ export default function Tasks() {
         </div>
       </div>
 
+      {/* Task list */}
       {filteredTasks.length === 0 ? (
         <p className="text-gray-500 dark:text-gray-400 text-sm mt-10">
           No tasks match the selected filters.
@@ -105,6 +111,10 @@ export default function Tasks() {
               completed={task.completed}
               onToggle={() => toggleTask(task.id)}
               onDelete={() => deleteTask(task.id)}
+              onEdit={() => {
+                setEditingTask(task);
+                setIsModalOpen(true);
+              }}
             />
           ))}
         </section>
@@ -112,7 +122,11 @@ export default function Tasks() {
 
       <AddTaskModal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={() => {
+          setIsModalOpen(false);
+          setEditingTask(null);
+        }}
+        defaultValues={editingTask ?? undefined}
       />
     </div>
   );

@@ -1,17 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { nanoid } from "nanoid";
-
-export type Priority = "low" | "medium" | "high";
-
-export interface Task {
-  id: string;
-  title: string;
-  description?: string;
-  completed: boolean;
-  priority: Priority;
-  createdAt: number;
-}
+import type { Task, Priority } from "../types";
 
 interface TaskState {
   tasks: Task[];
@@ -33,7 +23,7 @@ export const useTaskStore = create<TaskState>()(
             {
               ...task,
               id: nanoid(),
-              createdAt: Date.now(),
+              createdAt: new Date().toISOString(), // ✅ cambio aquí
             },
             ...state.tasks,
           ],
