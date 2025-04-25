@@ -37,7 +37,7 @@ export default function TaskCard({
 
   return (
     <div
-      className={`relative bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm ${padding} flex flex-col ${gap} transition hover:shadow-md group`}
+      className={`relative bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm ${padding} flex flex-col ${gap} transition hover:shadow-md group`}
     >
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-2">
