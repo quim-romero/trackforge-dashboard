@@ -4,6 +4,7 @@ import AddTaskModal from "../components/AddTaskModal";
 import { useTaskStore } from "../store/useTaskStore";
 import { useSettingsStore } from "../store/useSettingsStore";
 import type { Task } from "../types";
+import { AnimatePresence } from "framer-motion";
 
 export default function Tasks() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -60,7 +61,6 @@ export default function Tasks() {
       </header>
 
       <div className="flex flex-wrap gap-4">
-        {/* Filters */}
         <div>
           <label className="block text-sm text-gray-600 dark:text-gray-300 mb-1">
             Status
@@ -93,7 +93,6 @@ export default function Tasks() {
         </div>
       </div>
 
-      {/* Task list */}
       {filteredTasks.length === 0 ? (
         <p className="text-gray-500 dark:text-gray-400 text-sm mt-10">
           No tasks match the selected filters.
@@ -102,21 +101,23 @@ export default function Tasks() {
         <section
           className={`grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 ${cardGridGap}`}
         >
-          {filteredTasks.map((task) => (
-            <TaskCard
-              key={task.id}
-              title={task.title}
-              description={task.description}
-              priority={task.priority}
-              completed={task.completed}
-              onToggle={() => toggleTask(task.id)}
-              onDelete={() => deleteTask(task.id)}
-              onEdit={() => {
-                setEditingTask(task);
-                setIsModalOpen(true);
-              }}
-            />
-          ))}
+          <AnimatePresence>
+            {filteredTasks.map((task) => (
+              <TaskCard
+                key={task.id}
+                title={task.title}
+                description={task.description}
+                priority={task.priority}
+                completed={task.completed}
+                onToggle={() => toggleTask(task.id)}
+                onDelete={() => deleteTask(task.id)}
+                onEdit={() => {
+                  setEditingTask(task);
+                  setIsModalOpen(true);
+                }}
+              />
+            ))}
+          </AnimatePresence>
         </section>
       )}
 

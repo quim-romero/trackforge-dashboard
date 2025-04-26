@@ -1,5 +1,7 @@
 import { Check, Pencil, Trash2 } from "lucide-react";
 import { useSettingsStore } from "../store/useSettingsStore";
+import { motion } from "framer-motion";
+import { useState } from "react";
 
 type TaskCardProps = {
   title: string;
@@ -21,6 +23,7 @@ export default function TaskCard({
   onDelete,
 }: TaskCardProps) {
   const density = useSettingsStore((state) => state.density);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const padding = density === "compact" ? "p-2" : "p-4";
   const gap = density === "compact" ? "gap-1" : "gap-2";
@@ -36,8 +39,12 @@ export default function TaskCard({
   }[priority];
 
   return (
-    <div
-      className={`relative bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm ${padding} flex flex-col ${gap} transition hover:shadow-md group`}
+    <motion.div
+      layout
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
+      className={`relative bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm ${padding} flex flex-col ${gap} transition hover:shadow-md group`}
     >
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-2">
@@ -71,7 +78,7 @@ export default function TaskCard({
             <Pencil className={iconSize} />
           </button>
           <button
-            onClick={onDelete}
+            onClick={() => setShowConfirm(true)}
             className="text-gray-500 hover:text-red-500 dark:hover:text-red-400"
           >
             <Trash2 className={iconSize} />
@@ -88,6 +95,33 @@ export default function TaskCard({
       <span
         className={`absolute top-3 right-3 w-2 h-2 rounded-full ${priorityColor}`}
       />
-    </div>
+
+      {showConfirm && (
+        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-10 rounded-xl">
+          <div className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md p-4 space-y-2 shadow-xl text-center">
+            <p className="text-sm text-gray-700 dark:text-gray-200">
+              Are you sure you want to delete this task?
+            </p>
+            <div className="flex justify-center gap-3">
+              <button
+                onClick={() => setShowConfirm(false)}
+                className="text-sm px-3 py-1 rounded-md bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  onDelete?.();
+                  setShowConfirm(false);
+                }}
+                className="text-sm px-3 py-1 rounded-md bg-red-500 text-white hover:bg-red-600"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </motion.div>
   );
 }

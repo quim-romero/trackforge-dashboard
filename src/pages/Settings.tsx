@@ -1,44 +1,61 @@
 import { useSettingsStore } from "../store/useSettingsStore";
 
 export default function Settings() {
-  const { density, animations, setDensity, toggleAnimations } = useSettingsStore();
+  const { density, animations, setDensity, toggleAnimations } =
+    useSettingsStore();
+
+  const padding = density === "compact" ? "p-4" : "p-6";
+  const gap = density === "compact" ? "space-y-4" : "space-y-6";
+  const titleSize = density === "compact" ? "text-xl" : "text-2xl";
+  const descriptionSize = density === "compact" ? "text-xs" : "text-sm";
 
   return (
-    <div className="space-y-6 max-w-xl">
+    <div className={`${gap} max-w-xl`}>
       <header>
-        <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+        <h2
+          className={`${titleSize} font-semibold text-gray-900 dark:text-gray-100`}
+        >
           Settings
         </h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400">
+        <p className={`${descriptionSize} text-gray-500 dark:text-gray-400`}>
           Customize how TrackForge behaves and feels.
         </p>
       </header>
 
-      <section className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm p-6 space-y-6">
+      <section
+        className={`bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm ${padding} ${gap}`}
+      >
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             UI Density
           </label>
           <select
             value={density}
-            onChange={(e) => setDensity(e.target.value as "comfortable" | "compact")}
-            className="w-full px-3 py-2 text-sm rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+            onChange={(e) =>
+              setDensity(e.target.value as "comfortable" | "compact")
+            }
+            className={`w-full px-4 py-2 rounded-md text-sm transition
+              border border-gray-300 dark:border-gray-600
+              bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
+              focus:outline-none focus:ring-2 focus:ring-brand`}
           >
-            <option value="comfortable">Comfortable</option>
-            <option value="compact">Compact</option>
+            <option value="comfortable">Comfortable – spacious layout</option>
+            <option value="compact">Compact – tighter spacing</option>
           </select>
         </div>
 
         <div className="flex items-center justify-between">
           <div>
-            <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">Animations</h4>
+            <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Animations
+            </h4>
             <p className="text-xs text-gray-500 dark:text-gray-400">
               Enable or disable transition effects.
             </p>
           </div>
           <button
             onClick={toggleAnimations}
-            className={`w-12 h-6 rounded-full flex items-center px-1 transition ${
+            className={`w-12 h-6 rounded-full flex items-center px-1 transition-colors duration-200 ${
               animations
                 ? "bg-brand justify-end"
                 : "bg-gray-300 dark:bg-gray-600 justify-start"
