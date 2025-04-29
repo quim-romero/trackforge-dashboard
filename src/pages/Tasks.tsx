@@ -4,7 +4,7 @@ import AddTaskModal from "../components/AddTaskModal";
 import { useTaskStore } from "../store/useTaskStore";
 import { useSettingsStore } from "../store/useSettingsStore";
 import type { Task } from "../types";
-import { AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 
 export default function Tasks() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -60,6 +60,7 @@ export default function Tasks() {
         </button>
       </header>
 
+      {/* Filters */}
       <div className="flex flex-wrap gap-4">
         <div>
           <label className="block text-sm text-gray-600 dark:text-gray-300 mb-1">
@@ -93,6 +94,7 @@ export default function Tasks() {
         </div>
       </div>
 
+      {/* Task list */}
       {filteredTasks.length === 0 ? (
         <p className="text-gray-500 dark:text-gray-400 text-sm mt-10">
           No tasks match the selected filters.
@@ -101,26 +103,35 @@ export default function Tasks() {
         <section
           className={`grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 ${cardGridGap}`}
         >
-          <AnimatePresence>
+          <AnimatePresence mode="popLayout">
             {filteredTasks.map((task) => (
-              <TaskCard
+              <motion.div
                 key={task.id}
-                title={task.title}
-                description={task.description}
-                priority={task.priority}
-                completed={task.completed}
-                onToggle={() => toggleTask(task.id)}
-                onDelete={() => deleteTask(task.id)}
-                onEdit={() => {
-                  setEditingTask(task);
-                  setIsModalOpen(true);
-                }}
-              />
+                layout
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20, scale: 0.95 }}
+                transition={{ duration: 0.25, ease: "easeInOut" }}
+              >
+                <TaskCard
+                  title={task.title}
+                  description={task.description}
+                  priority={task.priority}
+                  completed={task.completed}
+                  onToggle={() => toggleTask(task.id)}
+                  onDelete={() => deleteTask(task.id)}
+                  onEdit={() => {
+                    setEditingTask(task);
+                    setIsModalOpen(true);
+                  }}
+                />
+              </motion.div>
             ))}
           </AnimatePresence>
         </section>
       )}
 
+      {/* Modal */}
       <AddTaskModal
         isOpen={isModalOpen}
         onClose={() => {
