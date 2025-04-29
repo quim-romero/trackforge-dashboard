@@ -9,10 +9,10 @@ export default function Layout() {
 
   return (
     <div className="flex min-h-screen bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100 transition-colors">
-      {/* Sidebar para escritorio */}
+      {}
       <Sidebar className="hidden md:flex" />
 
-      {/* Drawer para móvil */}
+      {}
       {isSidebarOpen && (
         <div className="fixed inset-0 z-50 md:hidden flex">
           <Sidebar
