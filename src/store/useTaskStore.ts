@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { nanoid } from "nanoid";
-import type { Task, Priority } from "../types";
+import type { Task } from "../types";
 
 interface TaskState {
   tasks: Task[];
